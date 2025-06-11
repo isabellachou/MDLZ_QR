@@ -5,6 +5,8 @@ const imageInput = document.getElementById("imageInput");
 const captionInput = document.getElementById("caption");
 
 let uploadedImage = null;
+let backgroundImage = new Image();
+backgroundImage.src = 'assets/background.png';
 
 imageInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
@@ -26,31 +28,70 @@ captionInput.addEventListener("input", () => {
     document.fonts.ready.then(drawPolaroid);
 });
 
+
 function drawPolaroid() {
-    // Clear canvas with purple background
-    ctx.fillStyle = "#4f2170";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (!backgroundImage.complete) {
+        backgroundImage.onload = drawPolaroid;
+        return;
+    }
 
-    if (!uploadedImage) return;
+    // Draw background frame image
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-    const imgWidth = 400;
-    const imgHeight = uploadedImage.height * (imgWidth / uploadedImage.width);
-    const imgX = (canvas.width - imgWidth) / 2;
-    const imgY = 50;
+    // If image is uploaded, draw it
+    if (uploadedImage) {
+        const photoX = 50;
+        const photoY = 50;
+        const photoWidth = 400;
+        const photoHeight = uploadedImage.height * (photoWidth / uploadedImage.width);
+        ctx.drawImage(uploadedImage, photoX, photoY, photoWidth, photoHeight);
+    }
 
-    // Draw image
-    ctx.drawImage(uploadedImage, imgX, imgY, imgWidth, imgHeight);
-
-    // Draw caption text using custom font
+    // Always draw caption (even if it's empty or no image)
     ctx.font = "40px 'MDLZ'";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
-    ctx.fillText(captionInput.value, canvas.width / 2, imgY + imgHeight + 80);
+
+    const caption = captionInput.value;
+    const maxTextWidth = 400;
+    const words = caption.split(" ").filter(w => w.length > 0);
+    let lines = [];
+
+    if (words.length > 0) {
+        let currentLine = words[0];
+        for (let i = 1; i < words.length; i++) {
+            const testLine = currentLine + " " + words[i];
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width < maxTextWidth) {
+                currentLine = testLine;
+            } else {
+                lines.push(currentLine);
+                currentLine = words[i];
+            }
+        }
+        lines.push(currentLine);
+    }
+
+    const startY = canvas.height - 70;
+    lines.forEach((line, i) => {
+        ctx.fillText(line, canvas.width / 2, startY + i * 40);
+    });
 }
 
 function downloadImage() {
+    let caption = captionInput.value.trim();
+
+    // Fallback name if caption is empty
+    if (!caption) caption = "polaroid";
+
+    // Sanitize filename: remove illegal characters
+    const safeFilename = caption.replace(/[^a-z0-9_\-]/gi, '_').toLowerCase();
+
     const link = document.createElement('a');
-    link.download = 'purple_polaroid.png';
+    link.download = `${safeFilename}.png`;
     link.href = canvas.toDataURL();
     link.click();
 }
+
+document.fonts.ready.then(drawPolaroid);

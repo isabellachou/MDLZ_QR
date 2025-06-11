@@ -20,8 +20,8 @@ body {
 
 canvas {
     margin-top: 1em;
-    border: 1px solid #ccc;
-    background: #4f2170; /* MDLZ purple */
+    border: 1px #ccc;
+    background: transparent;
     max-height: 65vh;
     height: auto;
 }
