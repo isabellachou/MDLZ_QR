@@ -1,10 +1,10 @@
 @font-face {
-    font-family: 'MDLZ';
-    src: url('fonts/MDLZBITETYPE-REGULAR_0\ 3.OTF') format('truetype');
+    font-family: 'brownie';
+    src: url('fonts/BrownieCake.otf') format('truetype');
 }
 
 body {
-    font-family: 'MDLZ';
+    font-family: 'brownie';
     text-align: center;
     background: #f7f0ff;
     margin: 0;

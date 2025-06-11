@@ -49,7 +49,7 @@ function drawPolaroid() {
     }
 
     // Always draw caption (even if it's empty or no image)
-    ctx.font = "40px 'MDLZ'";
+    ctx.font = "40px 'brownie'";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
 
